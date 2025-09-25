@@ -10,31 +10,37 @@ function Register() {
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      const user = auth.currentUser;
-      console.log(user);
-    //   if (user) {
-    //     await setDoc(doc(db, "Users", user.uid), {
-    //       email: user.email,
-    //       firstName: fname,
-    //       lastName: lname,
-    //       photo:""
-    //     });
-    //   }
-      console.log("User Registered Successfully!!");
-      toast.success("User Registered Successfully!!", {
-        position: "top-center",
+const handleRegister = async (e) => {
+  e.preventDefault();
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    const user = auth.currentUser;
+    if (user) {
+      await setDoc(doc(db, "Users", user.uid), {
+        email: user.email,
+        firstName: fname,
+        lastName: lname,
+        photo: ""
       });
-    } catch (error) {
-      console.log(error.message);
+    }
+    console.log("User Registered Successfully!!");
+    toast.success("User Registered Successfully!!", {
+      position: "top-center",
+    });
+  } catch (error) {
+    // Xử lý lỗi cụ thể
+    if (error.code === "auth/email-already-in-use") {
+      toast.error("Email đã được sử dụng. Vui lòng đăng nhập hoặc sử dụng email khác.", {
+        position: "bottom-center",
+      });
+    } else {
       toast.error(error.message, {
         position: "bottom-center",
       });
     }
-  };
+    console.log(error.message);
+  }
+};
 
   return (
     <form onSubmit={handleRegister}>
